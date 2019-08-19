@@ -2,16 +2,20 @@ __author__ = ["Markus Löning"]
 
 import os
 
-from datasets import univariate_datasets, multivariate_datasets
-
 from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
-from sktime.benchmarking.results import HDDResults
 from sktime.benchmarking.orchestration import Orchestrator
-from sktime.classifiers.compose import TimeSeriesForestClassifier
+from sktime.benchmarking.results import HDDResults
+from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
+from sktime.contrib.rotation_forest.rotation_forest_dev import RotationForest
+from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
 from sktime.highlevel.strategies import TSCStrategy
 from sktime.highlevel.tasks import TSCTask
 from sktime.model_selection import PresplitFilesCV
+from sktime.pipeline import Pipeline
+from sktime.transformers.compose import Tabulariser
+
+from datasets import univariate_datasets
 
 # set up paths
 home_path = os.path.expanduser("~")
@@ -23,7 +27,7 @@ assert os.path.exists(results_path)
 assert all([os.path.exists(os.path.join(data_path, dataset)) for dataset in univariate_datasets])
 
 # select datasets
-dataset_names = univariate_datasets
+dataset_names = univariate_datasets[:3]
 print(dataset_names)
 
 # generate dataset hooks and tasks
@@ -31,8 +35,15 @@ datasets = make_datasets(data_path, UEADataset, names=dataset_names)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
 # specify strategies
+
+estimator = Pipeline([
+    ("transform", Tabulariser()),
+    ("clf", RotationForestClassifier(n_estimators=1, p_instance_subset=1))
+    # ("clf", RotationForest(n_estimators=1))
+])
+
 strategies = [
-    TSCStrategy(TimeSeriesForestClassifier(n_estimators=1), name="tsf1"),
+    TSCStrategy(estimator=estimator, name="rotf"),
 ]
 
 # define results output
@@ -48,7 +59,7 @@ orchestrator = Orchestrator(datasets=datasets,
 orchestrator.fit_predict(
     save_fitted_strategies=False,
     overwrite_fitted_strategies=False,
-    overwrite_predictions=False,
+    overwrite_predictions=True,
     predict_on_train=False,
     verbose=1
 )
