@@ -6,12 +6,12 @@ import os
 
 from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
-from sktime.benchmarking.orchestration import Orchestrator
 from sktime.benchmarking.evaluation import Evaluator
-from sktime.benchmarking.results import HDDResults
-from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
 # from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
 from sktime.benchmarking.metrics import Accuracy
+from sktime.benchmarking.orchestration import Orchestrator
+from sktime.benchmarking.results import HDDResults
+from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
 from sktime.highlevel.strategies import TSCStrategy
 from sktime.highlevel.tasks import TSCTask
 from sktime.model_selection import PresplitFilesCV
@@ -48,9 +48,11 @@ def make_reduction_pipeline(estimator):
 
 
 strategies = [
-    TSCStrategy(estimator=make_reduction_pipeline(RotationForestClassifier(n_estimators=1)),
-                name="markus"),
-    # TSCStrategy(estimator=make_reduction_pipeline(RotationForest()), name="tony"),
+    TSCStrategy(
+        estimator=make_reduction_pipeline(
+            RotationForestClassifier(n_estimators=200, min_columns_subset=3, max_columns_subset=3,
+                                     p_instance_subset=0.50)),
+        name="rotf")
 ]
 
 # define results output
