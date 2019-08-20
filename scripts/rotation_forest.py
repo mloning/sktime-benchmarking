@@ -66,8 +66,8 @@ orchestrator = Orchestrator(datasets=datasets,
                             results=results)
 
 orchestrator.fit_predict(
-    save_fitted_strategies=False,
-    overwrite_fitted_strategies=False,
+    save_fitted_strategies=True,
+    overwrite_fitted_strategies=True,
     overwrite_predictions=True,
     predict_on_train=False,
     verbose=1
