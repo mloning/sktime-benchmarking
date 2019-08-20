@@ -5,10 +5,11 @@ import os
 from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
 from sktime.benchmarking.orchestration import Orchestrator
+from sktime.benchmarking.evaluation import Evaluator
 from sktime.benchmarking.results import HDDResults
 from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
-from sktime.contrib.rotation_forest.rotation_forest_dev import RotationForest
 from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
+from sktime.benchmarking.metrics import Accuracy
 from sktime.highlevel.strategies import TSCStrategy
 from sktime.highlevel.tasks import TSCTask
 from sktime.model_selection import PresplitFilesCV
@@ -27,23 +28,27 @@ assert os.path.exists(results_path)
 assert all([os.path.exists(os.path.join(data_path, dataset)) for dataset in univariate_datasets])
 
 # select datasets
-dataset_names = univariate_datasets[:3]
+dataset_names = univariate_datasets
 print(dataset_names)
 
 # generate dataset hooks and tasks
 datasets = make_datasets(data_path, UEADataset, names=dataset_names)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
-# specify strategies
 
-estimator = Pipeline([
-    ("transform", Tabulariser()),
-    ("clf", RotationForestClassifier(n_estimators=1, p_instance_subset=1))
-    # ("clf", RotationForest(n_estimators=1))
-])
+# specify strategies
+def make_reduction_pipeline(estimator):
+    pipeline = Pipeline([
+        ("transform", Tabulariser()),
+        ("clf", estimator)
+    ])
+    return pipeline
+
 
 strategies = [
-    TSCStrategy(estimator=estimator, name="rotf"),
+    TSCStrategy(estimator=make_reduction_pipeline(RotationForestClassifier(n_estimators=1)),
+                name="markus"),
+    # TSCStrategy(estimator=make_reduction_pipeline(RotationForest()), name="tony"),
 ]
 
 # define results output
@@ -63,3 +68,9 @@ orchestrator.fit_predict(
     predict_on_train=False,
     verbose=1
 )
+
+# evaluate scores
+evaluator = Evaluator(results=results)
+metric = Accuracy()
+scores = evaluator.evaluate(metric=metric)
+print(scores)
