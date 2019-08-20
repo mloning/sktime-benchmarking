@@ -21,20 +21,20 @@ from sktime.transformers.compose import Tabulariser
 from datasets import univariate_datasets
 
 # set up paths
-home_path = os.path.expanduser("~")
-data_path = os.path.join(home_path, "Documents/Research/data/univariate-timeseries")
-results_path = os.path.join(home_path, "Documents/Research/toolboxes/sktime-benchmarking/results/rotf")
-assert os.path.exists(home_path)
-assert os.path.exists(data_path)
-assert os.path.exists(results_path)
-assert all([os.path.exists(os.path.join(data_path, dataset)) for dataset in univariate_datasets])
+HOME = os.path.expanduser("~")
+DATA_PATH = os.path.join(HOME, "Documents/Research/data/Univariate_ts/")
+RESULTS_PATH = os.path.join(HOME, "Documents/Research/toolboxes/sktime-benchmarking/results/rotf")
+assert os.path.exists(HOME)
+assert os.path.exists(DATA_PATH)
+assert os.path.exists(RESULTS_PATH)
+assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univariate_datasets])
 
 # select datasets
 dataset_names = univariate_datasets
 print(dataset_names)
 
 # generate dataset hooks and tasks
-datasets = make_datasets(data_path, UEADataset, names=dataset_names)
+datasets = make_datasets(DATA_PATH, UEADataset, names=dataset_names)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
 
@@ -54,7 +54,7 @@ strategies = [
 ]
 
 # define results output
-results = HDDResults(predictions_path=results_path)
+results = HDDResults(predictions_path=RESULTS_PATH)
 
 # run orchestrator
 orchestrator = Orchestrator(datasets=datasets,
