@@ -115,7 +115,7 @@ univariate_datasets = [
     "SmoothSubspace",
     "SonyAIBORobotSurface1",
     "SonyAIBORobotSurface2",
-    "StarlightCurves",
+    # "StarlightCurves",
     "Strawberry",
     "SwedishLeaf",
     "Symbols",
