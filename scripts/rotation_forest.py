@@ -10,7 +10,7 @@ from sktime.benchmarking.orchestration import Orchestrator
 from sktime.benchmarking.evaluation import Evaluator
 from sktime.benchmarking.results import HDDResults
 from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
-from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
+# from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
 from sktime.benchmarking.metrics import Accuracy
 from sktime.highlevel.strategies import TSCStrategy
 from sktime.highlevel.tasks import TSCTask
@@ -23,7 +23,7 @@ from datasets import univariate_datasets
 # set up paths
 home_path = os.path.expanduser("~")
 data_path = os.path.join(home_path, "Documents/Research/data/univariate-timeseries")
-results_path = os.path.join(home_path, "Documents/Research/toolboxes/sktime-benchmarking/results")
+results_path = os.path.join(home_path, "Documents/Research/toolboxes/sktime-benchmarking/results/rotf")
 assert os.path.exists(home_path)
 assert os.path.exists(data_path)
 assert os.path.exists(results_path)
