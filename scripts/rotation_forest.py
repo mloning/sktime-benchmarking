@@ -30,7 +30,7 @@ assert os.path.exists(RESULTS_PATH)
 assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univariate_datasets])
 
 # select datasets
-dataset_names = univariate_datasets
+dataset_names = univariate_datasets[:1]
 print(dataset_names)
 
 # generate dataset hooks and tasks
