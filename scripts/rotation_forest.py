@@ -4,11 +4,12 @@ __author__ = ["Markus Löning"]
 
 import os
 
+from sklearn.metrics import accuracy_score
 from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
 from sktime.benchmarking.evaluation import Evaluator
 # from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
-from sktime.benchmarking.metrics import Accuracy
+from sktime.benchmarking.metrics import PairwiseMetric
 from sktime.benchmarking.orchestration import Orchestrator
 from sktime.benchmarking.results import HDDResults
 from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
@@ -23,14 +24,26 @@ from datasets import univariate_datasets
 # set up paths
 HOME = os.path.expanduser("~")
 DATA_PATH = os.path.join(HOME, "Documents/Research/data/Univariate_ts/")
-RESULTS_PATH = os.path.join(HOME, "Documents/Research/toolboxes/sktime-benchmarking/results/rotf")
+RESULTS_PATH = os.path.join(HOME, "Documents/Research/toolboxes/sktime-benchmarking/results/rotf_update/")
 assert os.path.exists(HOME)
 assert os.path.exists(DATA_PATH)
 assert os.path.exists(RESULTS_PATH)
 assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univariate_datasets])
 
 # select datasets
-dataset_names = univariate_datasets[:1]
+dataset_names = univariate_datasets
+# dataset_names = [
+#     'SmallKitchenAppliances',
+#     'MiddlePhalanxOutlineCorrect',
+#     'MiddlePhalanxOutlineAgeGroup',
+#     'ACSF1',
+#     'PhalangesOutlinesCorrect',
+#     'Computers',
+#     'DistalPhalanxOutlineAgeGroup',
+#     'FaceFour',
+#     'DistalPhalanxOutlineCorrect',
+#     'Symbols'
+# ]
 print(dataset_names)
 
 # generate dataset hooks and tasks
@@ -50,13 +63,19 @@ def make_reduction_pipeline(estimator):
 strategies = [
     TSCStrategy(
         estimator=make_reduction_pipeline(
-            RotationForestClassifier(n_estimators=200, min_columns_subset=3, max_columns_subset=3,
-                                     p_instance_subset=0.50)),
+            RotationForestClassifier(
+                n_estimators=200,
+                min_columns_subset=3,
+                max_columns_subset=3,
+                p_instance_subset=0.75,
+                random_state=1,
+                bootstrap_instance_subset=True)
+        ),
         name="rotf")
 ]
 
 # define results output
-results = HDDResults(predictions_path=RESULTS_PATH)
+results = HDDResults(path=RESULTS_PATH)
 
 # run orchestrator
 orchestrator = Orchestrator(datasets=datasets,
@@ -73,8 +92,11 @@ orchestrator.fit_predict(
     verbose=1
 )
 
-# evaluate scores
+# evaluate predictions
 evaluator = Evaluator(results=results)
-metric = Accuracy()
-scores = evaluator.evaluate(metric=metric)
-print(scores)
+metric = PairwiseMetric(func=accuracy_score, name="accuracy")
+metrics_by_strategy = evaluator.evaluate(metric=metric)
+
+# save scores
+evaluator.metrics_by_strategy_dataset.to_csv(os.path.join(RESULTS_PATH, "accuracy.csv"),
+                                             header=True)

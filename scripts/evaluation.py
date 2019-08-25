@@ -5,7 +5,8 @@ __author__ = ["Markus Löning"]
 import os
 from joblib import load
 from sktime.benchmarking.evaluation import Evaluator
-from sktime.benchmarking.metrics import Accuracy
+from sktime.benchmarking.metrics import PairwiseMetric
+from sklearn.metrics import accuracy_score
 
 # set up paths
 HOME = os.path.expanduser("~")
@@ -17,12 +18,13 @@ assert os.path.exists(RESULTS_PATH)
 results = load(os.path.join(RESULTS_PATH, "results.pickle"))
 
 # evaluate predictions
-evaluator = Evaluator(results)
-metric = Accuracy()
-scores = evaluator.evaluate(metric)
+evaluator = Evaluator(results=results)
+metric = PairwiseMetric(func=accuracy_score, name="accuracy")
+metrics_by_strategy = evaluator.evaluate(metric=metric)
 
-# reformat output
-scores = scores.reset_index().drop(columns="level_1").rename(columns={"level_0": "dataset"})
+# save scores
+evaluator.metrics_by_strategy_dataset.to_csv(os.path.join(RESULTS_PATH, "accuracy.csv"),
+                                             header=True)
 
-# save format
-scores.to_csv(os.path.join(RESULTS_PATH, f"{metric.name}.csv"), header=True)
+
+
