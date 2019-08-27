@@ -4,6 +4,7 @@ __author__ = ["Markus Löning"]
 
 import os
 
+import time
 from sklearn.metrics import accuracy_score
 from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
@@ -31,19 +32,11 @@ assert os.path.exists(RESULTS_PATH)
 assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univariate_datasets])
 
 # select datasets
-dataset_names = univariate_datasets
-# dataset_names = [
-#     'SmallKitchenAppliances',
-#     'MiddlePhalanxOutlineCorrect',
-#     'MiddlePhalanxOutlineAgeGroup',
-#     'ACSF1',
-#     'PhalangesOutlinesCorrect',
-#     'Computers',
-#     'DistalPhalanxOutlineAgeGroup',
-#     'FaceFour',
-#     'DistalPhalanxOutlineCorrect',
-#     'Symbols'
-# ]
+# dataset_names = univariate_datasets
+dataset_names = [
+    'SemgHandMovementCh2',
+    # 'EOGHorizontalSignal'
+]
 print(dataset_names)
 
 # generate dataset hooks and tasks
@@ -67,9 +60,10 @@ strategies = [
                 n_estimators=200,
                 min_columns_subset=3,
                 max_columns_subset=3,
-                p_instance_subset=0.75,
-                random_state=1,
-                bootstrap_instance_subset=True)
+                p_instance_subset=0.5,
+                bootstrap_instance_subset=False,
+                verbose=True
+            )
         ),
         name="rotf")
 ]
@@ -84,13 +78,16 @@ orchestrator = Orchestrator(datasets=datasets,
                             cv=PresplitFilesCV(),
                             results=results)
 
+start = time.time()
 orchestrator.fit_predict(
     save_fitted_strategies=True,
     overwrite_fitted_strategies=True,
     overwrite_predictions=True,
     predict_on_train=False,
-    verbose=1
+    verbose=True
 )
+elapsed = time.time() - start
+print(elapsed)
 
 # evaluate predictions
 evaluator = Evaluator(results=results)
@@ -98,5 +95,6 @@ metric = PairwiseMetric(func=accuracy_score, name="accuracy")
 metrics_by_strategy = evaluator.evaluate(metric=metric)
 
 # save scores
-evaluator.metrics_by_strategy_dataset.to_csv(os.path.join(RESULTS_PATH, "accuracy.csv"),
-                                             header=True)
+# evaluator.metrics_by_strategy_dataset.to_csv(os.path.join(RESULTS_PATH, "accuracy.csv"),
+#                                              header=True)
+print(evaluator.metrics_by_strategy_dataset)
