@@ -38,7 +38,7 @@ assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univ
 dataset_names = univariate_datasets
 # dataset_names = [
 #     # 'SemgHandMovementCh2',
-#     'EOGHorizontalSignal'
+#     'FaceFour'
 # ]
 # print(dataset_names)
 
@@ -70,9 +70,12 @@ def make_reduction_pipeline(estimator):
 
 estimator = RotationForestClassifier(
     n_estimators=200,
-    n_features_per_subset=3,
-    rotation_algo="pca",
-    n_jobs=-1,
+    min_features_subset=3,
+    max_features_subset=3,
+    p_sample_subset=0.5,
+    bootstrap_sample_subset=False,
+    transformation="pca",
+    n_jobs=-1
 )
 
 strategies = [
