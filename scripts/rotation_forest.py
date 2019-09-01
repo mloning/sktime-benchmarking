@@ -10,7 +10,7 @@ from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
 from sktime.benchmarking.evaluation import Evaluator
 # from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
-from rotf import RotationForestClassifier
+from rotf import RotationForestClassifier, RotationTreeClassifier
 from sktime.benchmarking.metrics import PairwiseMetric
 from sktime.benchmarking.orchestration import Orchestrator
 from sktime.benchmarking.results import HDDResults, RAMResults
@@ -22,8 +22,11 @@ from sktime.pipeline import Pipeline
 from sktime.transformers.compose import Tabulariser
 from sklearn.preprocessing import Normalizer
 from sklearn.feature_selection import VarianceThreshold
-
+import warnings
+from sklearn.exceptions import DataConversionWarning
 from datasets import univariate_datasets
+
+warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 
 # set up paths
 HOME = os.path.expanduser("~")
@@ -38,7 +41,8 @@ assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univ
 dataset_names = univariate_datasets
 # dataset_names = [
 #     # 'SemgHandMovementCh2',
-#     'FaceFour'
+#     # 'FaceFour'
+#     # 'Fungi'
 # ]
 # print(dataset_names)
 
@@ -67,6 +71,14 @@ def make_reduction_pipeline(estimator):
 #     verbose=True
 # )
 
+# estimator = RotationTreeClassifier(
+#     min_features_subset=3,
+#     max_features_subset=3,
+#     p_sample_subset=0.5,
+#     bootstrap_sample_subset=False,
+#     transformation="pca",
+#     random_state=1,
+# )
 
 estimator = RotationForestClassifier(
     n_estimators=200,
@@ -74,7 +86,6 @@ estimator = RotationForestClassifier(
     max_features_subset=3,
     p_sample_subset=0.5,
     bootstrap_sample_subset=False,
-    transformation="pca",
     n_jobs=-1
 )
 
