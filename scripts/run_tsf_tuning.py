@@ -7,25 +7,12 @@ from sklearn.metrics import accuracy_score
 from sktime.utils.time_series import time_series_slope
 import os
 import numpy as np
-import pandas as pd
 import time
 from scipy.stats import skew, kurtosis
 from numpy.core._internal import AxisError
-
+from utils import load_data
 
 # Load data
-def load_data(file_path):
-    with open(file_path) as f:
-        for line in f:
-            if line.strip():
-                if "@data" in line.lower():
-                    break
-
-        df = pd.read_csv(f, delimiter=',', header=None)
-        y = df.pop(df.shape[1] - 1)
-        X = pd.DataFrame([[row] for _, row in df.iterrows()])  # transform into nested pandas dataframe
-    return X, y
-
 
 data_path = os.path.abspath('../sktime-data/Downloads')
 

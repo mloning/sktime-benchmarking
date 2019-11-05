@@ -1,4 +1,5 @@
 #!/usr/bin/env python3 -u
+from utils import make_reduction_pipeline
 
 __author__ = ["Markus Löning"]
 
@@ -10,18 +11,14 @@ from sktime.benchmarking.data import UEADataset
 from sktime.benchmarking.data import make_datasets
 from sktime.benchmarking.evaluation import Evaluator
 # from sktime.contrib.rotation_forest.rotf_Tony import RotationForest
-from rotf import RotationForestClassifier, RotationTreeClassifier
+from rotf import RotationForestClassifier
 from sktime.benchmarking.metrics import PairwiseMetric
 from sktime.benchmarking.orchestration import Orchestrator
-from sktime.benchmarking.results import HDDResults, RAMResults
+from sktime.benchmarking.results import HDDResults
 # from sktime.contrib.rotation_forest.rotation_forest_reworked import RotationForestClassifier
 from sktime.highlevel.strategies import TSCStrategy
 from sktime.highlevel.tasks import TSCTask
 from sktime.model_selection import PresplitFilesCV
-from sktime.pipeline import Pipeline
-from sktime.transformers.compose import Tabulariser
-from sklearn.preprocessing import Normalizer
-from sklearn.feature_selection import VarianceThreshold
 import warnings
 from sklearn.exceptions import DataConversionWarning
 from datasets import univariate_datasets
@@ -50,16 +47,7 @@ dataset_names = univariate_datasets
 datasets = make_datasets(DATA_PATH, UEADataset, names=dataset_names)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
-
 # specify strategies
-def make_reduction_pipeline(estimator):
-    pipeline = Pipeline([
-        ("transform", Tabulariser()),
-        ("normalise", Normalizer()),
-        ("remove", VarianceThreshold()),
-        ("clf", estimator)
-    ])
-    return pipeline
 
 # estimator = RotationForestClassifier(
 #     n_estimators=200,

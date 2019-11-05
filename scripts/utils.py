@@ -1,9 +1,11 @@
 #!/usr/bin/env python3 -u
 # coding: utf-8
-
 __author__ = "Markus Löning"
 
-
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.preprocessing import Normalizer
+from sktime.pipeline import Pipeline
+from sktime.transformers.compose import Tabulariser
 from scipy.stats import wilcoxon, binom_test
 import numpy as np
 import pandas as pd
@@ -43,3 +45,26 @@ def compare_results(x, y):
             'red', linewidth=1)
     #  ax.set_aspect('equal')
     ax.set(xlabel=x.name, ylabel=y.name);
+
+
+def load_data(file_path):
+    with open(file_path) as f:
+        for line in f:
+            if line.strip():
+                if "@data" in line.lower():
+                    break
+
+        df = pd.read_csv(f, delimiter=',', header=None)
+        y = df.pop(df.shape[1] - 1)
+        X = pd.DataFrame([[row] for _, row in df.iterrows()])  # transform into nested pandas dataframe
+    return X, y
+
+
+def make_reduction_pipeline(estimator):
+    pipeline = Pipeline([
+        ("transform", Tabulariser()),
+        ("normalise", Normalizer()),
+        ("remove", VarianceThreshold()),
+        ("clf", estimator)
+    ])
+    return pipeline
