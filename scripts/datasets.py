@@ -1,4 +1,4 @@
-univariate_variable_length_datasets = [
+UNIVARIATE_VARIABLE_LENGTH_DATASETS = [
     "AllGestureWiimoteX",
     "AllGestureWiimoteY",
     "AllGestureWiimoteZ",
@@ -12,7 +12,7 @@ univariate_variable_length_datasets = [
     "ShakeGestureWiimoteZ"
 ]
 
-univariate_datasets = [
+UNIVARIATE_DATASETS = [
     "ACSF1",
     "Adiac",
     # "AllGestureWiimoteX",
@@ -138,7 +138,7 @@ univariate_datasets = [
     "Yoga",
 ]
 
-multivariate_datasets = [
+MULTIVARIATE_DATASETS = [
         "ArticularyWordRecognition",
         "AtrialFibrillation",
         "BasicMotions",
@@ -176,6 +176,6 @@ def assert_no_duplicates(datasets):
     assert len(datasets) == len(set(datasets))
 
 
-assert_no_duplicates(univariate_variable_length_datasets)
-assert_no_duplicates(univariate_datasets)
-assert_no_duplicates(multivariate_datasets)
+assert_no_duplicates(UNIVARIATE_VARIABLE_LENGTH_DATASETS)
+assert_no_duplicates(UNIVARIATE_DATASETS)
+assert_no_duplicates(MULTIVARIATE_DATASETS)

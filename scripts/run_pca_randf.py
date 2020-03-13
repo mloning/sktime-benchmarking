@@ -18,7 +18,7 @@ from sktime.highlevel.tasks import TSCTask
 from sktime.model_selection import PresplitFilesCV
 import warnings
 from sklearn.exceptions import DataConversionWarning
-from datasets import univariate_datasets
+from datasets import UNIVARIATE_DATASETS
 from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.preprocessing import Normalizer
@@ -34,10 +34,10 @@ RESULTS_PATH = os.path.join(HOME, "Documents/Research/toolboxes/sktime-benchmark
 assert os.path.exists(HOME)
 assert os.path.exists(DATA_PATH)
 assert os.path.exists(RESULTS_PATH)
-assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in univariate_datasets])
+assert all([os.path.exists(os.path.join(DATA_PATH, dataset)) for dataset in UNIVARIATE_DATASETS])
 
 # select datasets
-dataset_names = univariate_datasets
+dataset_names = UNIVARIATE_DATASETS
 # dataset_names = [
 #     # 'SemgHandMovementCh2',
 #     # 'FaceFour'
