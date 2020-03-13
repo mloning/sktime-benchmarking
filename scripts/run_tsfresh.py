@@ -18,13 +18,17 @@ from sktime.benchmarking.results import HDDResults
 from sktime.highlevel.strategies import TSCStrategy
 from sktime.highlevel.tasks import TSCTask
 from sktime.model_selection import PresplitFilesCV
+from sklearn.pipeline import Pipeline
+from sktime.transformers.summarise import TSFreshFeatureExtractor
+from sklearn.ensemble import RandomForestClassifier
+from sktime.transformers.segment import RandomIntervalSegmenter
 
 warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 
 # set up paths
 HOME = os.path.expanduser("~")
 DATA_PATH = os.path.join(HOME, "Documents/Research/data/Univariate_ts/")
-RESULTS_PATH = os.path.join(HOME, "Documents/Research/toolboxes/sktime-benchmarking/results/rotf_update/")
+RESULTS_PATH = os.path.join(HOME, "Documents/Research/toolboxes/sktime-benchmarking/results/tsfresh/")
 assert os.path.exists(HOME)
 assert os.path.exists(DATA_PATH)
 assert os.path.exists(RESULTS_PATH)
@@ -43,18 +47,32 @@ dataset_names = UNIVARIATE_DATASETS
 datasets = make_datasets(DATA_PATH, UEADataset, names=dataset_names)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
-from sklearn.pipeline import Pipeline
-from sktime.transformers.summarise import TSFreshFeatureExtractor
-from sklearn.ensemble import RandomForestClassifier
-
-estimator = Pipeline([
+efficient = Pipeline([
     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient")),
     ("classifier", RandomForestClassifier(n_estimators=200))
 ])
 
+# comprehensive = Pipeline([
+#     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="comprehensive")),
+#     ("classifier", RandomForestClassifier(n_estimators=200))
+# ])
+#
+# minimal = Pipeline([
+#     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="minimal")),
+#     ("classifier", RandomForestClassifier(n_estimators=200))
+# ])
+#
+#
+# efficient_segment = Pipeline([
+#     ("segment", RandomIntervalSegmenter(min_length=25, n_intervals="log")),
+#     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient")),
+#     ("classifier", RandomForestClassifier(n_estimators=200))
+# ])
+
+
 strategies = [
     TSCStrategy(
-        estimator=estimator,
+        estimator=efficient,
         name="tsfresh_rf")
 ]
 
