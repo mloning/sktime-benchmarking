@@ -48,8 +48,8 @@ datasets = make_datasets(DATA_PATH, UEADataset, names=dataset_names)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
 efficient = Pipeline([
-    ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient")),
-    ("classifier", RandomForestClassifier(n_estimators=200))
+    ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient", n_jobs=-1)),
+    ("classifier", RandomForestClassifier(n_estimators=200, n_jobs=-1))
 ])
 
 # comprehensive = Pipeline([
