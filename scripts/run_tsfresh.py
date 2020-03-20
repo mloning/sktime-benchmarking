@@ -50,14 +50,14 @@ tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 N_JOBS = os.cpu_count()
 
 efficient = Pipeline([
-    ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient", n_jobs=N_JOBS)),
+    ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient", n_jobs=N_JOBS, disable_progressbar=True)),
     ("classifier", RandomForestClassifier(n_estimators=200, n_jobs=N_JOBS))
 ])
 
-# comprehensive = Pipeline([
-#     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="comprehensive")),
-#     ("classifier", RandomForestClassifier(n_estimators=200))
-# ])
+comprehensive = Pipeline([
+    ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="comprehensive")),
+    ("classifier", RandomForestClassifier(n_estimators=200))
+])
 #
 # minimal = Pipeline([
 #     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="minimal")),
@@ -75,7 +75,10 @@ efficient = Pipeline([
 strategies = [
     TSCStrategy(
         estimator=efficient,
-        name="tsfresh_rf")
+        name="tsfresh_rf"),
+    TSCStrategy(
+        estimator=comprehensive,
+        name="tsfresh_rf_comprehensive")
 ]
 
 # define results output
@@ -92,7 +95,7 @@ start = time.time()
 orchestrator.fit_predict(
     save_fitted_strategies=False,
     overwrite_fitted_strategies=False,
-    overwrite_predictions=True,
+    overwrite_predictions=False,
     predict_on_train=False,
     verbose=True
 )
