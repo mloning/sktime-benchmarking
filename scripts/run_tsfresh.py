@@ -58,27 +58,24 @@ comprehensive = Pipeline([
     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="comprehensive")),
     ("classifier", RandomForestClassifier(n_estimators=200))
 ])
-#
-# minimal = Pipeline([
-#     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="minimal")),
-#     ("classifier", RandomForestClassifier(n_estimators=200))
-# ])
-#
-#
-# efficient_segment = Pipeline([
-#     ("segment", RandomIntervalSegmenter(min_length=25, n_intervals="log")),
-#     ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient")),
-#     ("classifier", RandomForestClassifier(n_estimators=200))
-# ])
+
+efficient_segment = Pipeline([
+    ("segment", RandomIntervalSegmenter(min_length=10, n_intervals="log")),
+    ("tsfresh", TSFreshFeatureExtractor(default_fc_parameters="efficient")),
+    ("classifier", RandomForestClassifier(n_estimators=200))
+])
 
 
 strategies = [
     TSCStrategy(
         estimator=efficient,
-        name="tsfresh_rf"),
+        name="tsfresh_rf_efficient"),
     TSCStrategy(
         estimator=comprehensive,
-        name="tsfresh_rf_comprehensive")
+        name="tsfresh_rf_comprehensive"),
+    TSCStrategy(
+        estimator=efficient_segment,
+        name="tsfresh_rf_efficient_segment")
 ]
 
 # define results output
