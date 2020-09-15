@@ -88,7 +88,6 @@ orchestrator = Orchestrator(datasets=datasets,
                             cv=PresplitFilesCV(),
                             results=results)
 
-start = time.time()
 orchestrator.fit_predict(
     save_fitted_strategies=False,
     overwrite_fitted_strategies=False,
@@ -96,8 +95,6 @@ orchestrator.fit_predict(
     predict_on_train=False,
     verbose=True
 )
-elapsed = time.time() - start
-print(elapsed)
 
 # evaluate predictions
 evaluator = Evaluator(results=results)
