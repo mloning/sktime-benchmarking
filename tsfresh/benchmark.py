@@ -6,7 +6,7 @@ __author__ = ["Markus Löning"]
 import os
 import warnings
 
-from ..utils.datasets import UNIVARIATE_DATASETS
+from datasets import UNIVARIATE_DATASETS
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.pipeline import make_pipeline
@@ -48,7 +48,7 @@ orchestrator = Orchestrator(
     datasets=datasets,
     tasks=tasks,
     strategies=strategies,
-    cv=PresplitFilesCV(cv=StratifiedKFold(n_splits=30, shuffle=True)),
+    cv=PresplitFilesCV(),
     results=results
 )
 orchestrator.fit_predict(save_fitted_strategies=False, verbose=True,
