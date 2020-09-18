@@ -37,9 +37,14 @@ tsfresh_rf_efficient_200 = make_pipeline(
                             n_jobs=N_JOBS, default_fc_parameters="efficient"),
     RandomForestClassifier(n_estimators=200, n_jobs=N_JOBS)
 )
+tsfresh_rf_comprehensive_200 = make_pipeline(
+        TSFreshFeatureExtractor(show_warnings=False, disable_progressbar=True, n_jobs=N_JOBS, default_fc_parameters="comprehensive"),
+        RandomForestClassifier(n_estimators=200, n_jobs=N_JOBS)
+)
 
 strategies = [
     TSCStrategy(tsfresh_rf_efficient_200, name="tsfresh-rf-efficient-200"),
+    TSCStrategy(tsfresh_rf_comprehensive_200, name="tsfresh-rf-comprehensive-200")
 ]
 
 results = HDDResults(path=RESULTS_PATH)
@@ -52,4 +57,4 @@ orchestrator = Orchestrator(
     results=results
 )
 orchestrator.fit_predict(save_fitted_strategies=False, verbose=True,
-                         overwrite_predictions=True)
+                         overwrite_predictions=False)
