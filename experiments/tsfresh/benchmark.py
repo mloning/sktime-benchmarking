@@ -32,6 +32,11 @@ datasets = make_datasets(path=DATA_PATH, dataset_cls=UEADataset,
                          names=UNIVARIATE_DATASETS)
 tasks = [TSCTask(target="target") for _ in range(len(datasets))]
 
+tsfresh_rf_minimal_200 = tsfresh_rf_efficient_200 = make_pipeline(
+    TSFreshFeatureExtractor(show_warnings=False, disable_progressbar=True, n_jobs=N_JOBS, default_fc_parameters="minimal"),
+    RandomForestClassifier(n_estimators=200, n_jobs=N_JOBS)
+    )
+          
 tsfresh_rf_efficient_200 = make_pipeline(
     TSFreshFeatureExtractor(show_warnings=False, disable_progressbar=True,
                             n_jobs=N_JOBS, default_fc_parameters="efficient"),
@@ -43,6 +48,7 @@ tsfresh_rf_comprehensive_200 = make_pipeline(
 )
 
 strategies = [
+    TSCStrategy(tsfresh_rf_minimal_200, name="tsfresh-rf-minimal-200"),
     TSCStrategy(tsfresh_rf_efficient_200, name="tsfresh-rf-efficient-200"),
     TSCStrategy(tsfresh_rf_comprehensive_200, name="tsfresh-rf-comprehensive-200")
 ]
