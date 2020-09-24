@@ -7,7 +7,7 @@ import warnings
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 from sktime.benchmarking.data import UEADataset
@@ -44,7 +44,6 @@ BASE_ESTIMATOR = Pipeline([
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-
 HOME = os.path.expanduser("~")
 DATA_PATH = os.path.join(HOME, "Documents/Research/data/Univariate_ts")
 RESULTS_PATH = "results"
@@ -56,8 +55,6 @@ datasets = make_datasets(path=DATA_PATH, dataset_cls=UEADataset,
 n_datasets = len(datasets)
 
 for i, dataset in enumerate(datasets):
-    print(f'Dataset: {i + 1}/{n_datasets} {dataset.name}')
-
     # pre-allocate results
     results = np.zeros(3)
 
@@ -70,7 +67,13 @@ for i, dataset in enumerate(datasets):
     # set CV
     _, counts = np.unique(y_train, return_counts=True)
     n_splits = np.minimum(counts.min(), 30)
-    cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=RANDOM_STATE)
+    n_repeats = np.maximum(1, 30 // n_splits)
+    # cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=RANDOM_STATE)
+    cv = RepeatedStratifiedKFold(n_splits=n_splits, n_repeats=n_repeats,
+                                 random_state=RANDOM_STATE)
+    total_n_splits = len(list(cv.split(X_train, y_train)))
+    print(f'Dataset: {i + 1}/{n_datasets} {dataset.name} - n_splits: {total_n_splits}')
+
 
     # set estimator
     estimator = TimeSeriesForestClassifier(BASE_ESTIMATOR)
