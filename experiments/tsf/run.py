@@ -23,8 +23,7 @@ from sktime.utils.time_series import time_series_slope
 from datasets import UNIVARIATE_DATASETS
 
 # Define param grid
-# n_estimators_list = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-n_estimators_list = [1, 2, 3]
+n_estimators_list = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 features_list = [
     [np.mean, np.std, time_series_slope],
     [np.mean, np.std, time_series_slope, skew],
@@ -34,8 +33,8 @@ features_list = [
 n_intervals_list = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 'log', 'sqrt']
 param_grid = {
     'n_estimators': n_estimators_list,
-    # 'estimator__transform__n_intervals': n_intervals_list,
-    # 'estimator__transform__features': features_list
+    'estimator__transform__n_intervals': n_intervals_list,
+    'estimator__transform__features': features_list
 }
 
 BASE_ESTIMATOR = Pipeline([
