@@ -23,14 +23,14 @@ from sktime.utils.time_series import time_series_slope
 from datasets import UNIVARIATE_DATASETS
 
 # Define param grid
-n_estimators_list = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+n_estimators_list = [50, 100, 200, 300, 400, 500]
 features_list = [
     [np.mean, np.std, time_series_slope],
     [np.mean, np.std, time_series_slope, skew],
     [np.mean, np.std, time_series_slope, kurtosis],
     [np.mean, np.std, time_series_slope, skew, kurtosis],
 ]
-n_intervals_list = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 'log', 'sqrt']
+n_intervals_list = [0.05, 0.1, 0.25, 0.5, 'log', 'sqrt']
 param_grid = {
     'n_estimators': n_estimators_list,
     'estimator__transform__n_intervals': n_intervals_list,
@@ -79,14 +79,13 @@ for i, dataset in enumerate(datasets):
         # random_state=RANDOM_STATE)
         inner_cv = RepeatedStratifiedKFold(n_splits=n_splits, n_repeats=n_repeats,
                                            random_state=RANDOM_STATE)
-        total_n_splits = len(list(inner_cv.split(X_train, y_train)))
         print(f'Dataset: {i + 1}/{n_datasets} {dataset.name} - n_splits: '
               f'{j + 1}/{OUTER_CV_N_SPLITS}')
 
         # set estimator
-        estimator = TimeSeriesForestClassifier(BASE_ESTIMATOR)
+        estimator = TimeSeriesForestClassifier(BASE_ESTIMATOR, n_jobs=-1)
         gscv = GridSearchCV(estimator, param_grid, scoring='neg_log_loss', cv=inner_cv,
-                            refit=True, iid=False, error_score='raise', n_jobs=-1)
+                            refit=True, iid=False, error_score='raise', verbose=True)
 
         # tune when enough samples for all classes are available
         start = time.time()
