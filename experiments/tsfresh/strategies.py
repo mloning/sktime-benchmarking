@@ -30,14 +30,17 @@ transformers = {
     "minimal": TSFreshFeatureExtractor("minimal", **kwargs),
     "efficient": TSFreshFeatureExtractor("efficient", **kwargs),
     "comprehensive": TSFreshFeatureExtractor("comprehensive", **kwargs),
-    "minimal_sig": TSFreshRelevantFeatureExtractor("minimal", **kwargs),
-    "efficient_sig": TSFreshRelevantFeatureExtractor("efficient", **kwargs),
-    "comprehensive_sig": TSFreshRelevantFeatureExtractor("comprehensive",
-                                                         **kwargs),
+    # "minimal_sig": TSFreshRelevantFeatureExtractor("minimal", **kwargs),
+    # "efficient_sig": TSFreshRelevantFeatureExtractor("efficient", **kwargs),
+    # "comprehensive_sig": TSFreshRelevantFeatureExtractor("comprehensive",
+    #                                                      **kwargs),
 }
 
 STRATEGIES = []
+ESTIMATORS = []
 for name, transformer in transformers.items():
     name = f"tsfresh_rf_{name}"
-    strategy = TSCStrategy(make_pipeline(transformer, regressor), name)
+    estimator = make_pipeline(transformer, regressor)
+    ESTIMATORS.append(estimator)
+    strategy = TSCStrategy(estimator, name)
     STRATEGIES.append(strategy)

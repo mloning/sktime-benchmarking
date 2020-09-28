@@ -14,12 +14,40 @@ from sktime.benchmarking.metrics import PairwiseMetric
 from sktime.benchmarking.orchestration import Orchestrator
 from sktime.benchmarking.results import HDDResults
 from sktime.benchmarking.tasks import TSCTask
+from sktime.contrib.experiments import stratified_resample
 from sktime.series_as_features.model_selection import PresplitFilesCV
 
-from strategies import STRATEGIES
 from datasets import UNIVARIATE_DATASETS
+from strategies import STRATEGIES
 
 warnings.filterwarnings("ignore", category=UserWarning)
+
+
+class UEAStratifiedCV:
+
+    def __init__(self, n_splits=30):
+        self.n_splits = n_splits
+
+    def split(self, X, y=None):
+        train = X.index == "train"
+        test = X.index == "test"
+
+        X = X.reset_index(drop=True)
+        y = y.reset_index(drop=True)
+
+        X_train = X.loc[train, :]
+        y_train = y.loc[train]
+        X_test = X.loc[test, :]
+        y_test = y.loc[test]
+
+        for i in range(self.n_splits):
+            X_train, y_train, X_test, y_test = stratified_resample(X_train, y_train,
+                                                                   X_test, y_test, i)
+            yield X_train.index.to_numpy(), X_test.index.to_numpy()
+
+    def get_n_splits(self):
+        return self.n_splits
+
 
 HOME = os.path.expanduser("~")
 DATA_PATH = os.path.join(HOME, "Documents/Research/data/Univariate_ts")
@@ -36,11 +64,11 @@ orchestrator = Orchestrator(
     datasets=datasets,
     tasks=tasks,
     strategies=STRATEGIES,
-    cv=PresplitFilesCV(),
+    cv=PresplitFilesCV(cv=UEAStratifiedCV(n_splits=30)),
     results=results
 )
 orchestrator.fit_predict(save_fitted_strategies=False, verbose=True,
-                         overwrite_predictions=True)
+                         overwrite_predictions=True, save_timings=True)
 
 evaluator = Evaluator(results=results)
 metric = PairwiseMetric(func=accuracy_score, name="accuracy")
